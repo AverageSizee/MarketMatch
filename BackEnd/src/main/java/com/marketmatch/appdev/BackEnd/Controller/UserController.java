@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.marketmatch.appdev.BackEnd.DTO.SEmailRequest;
+import com.marketmatch.appdev.BackEnd.DTO.StudentIdRequest;
 import com.marketmatch.appdev.BackEnd.Entity.LoginRequest;
 import com.marketmatch.appdev.BackEnd.Entity.UserEntity;
 import com.marketmatch.appdev.BackEnd.Service.TokenService;
@@ -55,6 +57,21 @@ public UserController(TokenService tokenService) {
 public ResponseEntity<UserEntity> postCourse(@RequestBody UserEntity user) {
 	UserEntity newUser = userv.addUserRecord(user);
 	return ResponseEntity.status(HttpStatus.CREATED).body(newUser);
+}
+
+@PostMapping("/check-student-id")
+public ResponseEntity<?> checkStudentIdExists(@RequestBody StudentIdRequest studentIdRequest) {
+	String studentId = studentIdRequest.getStudentId();
+	System.out.println(studentId);
+	boolean exists = userv.doesStudentIdExist(studentId);
+	return ResponseEntity.ok().body("{\"exists\": " + exists + "}");
+}
+
+@PostMapping("check-email")
+public ResponseEntity<?> checkEmailExists(@RequestBody SEmailRequest sEmailreqRequest) {
+	String email = sEmailreqRequest.getEmail();
+	boolean exists = userv.doesEmailExist(email);
+	return ResponseEntity.ok().body("{\"exists\": " + exists + "}");
 }
 
 

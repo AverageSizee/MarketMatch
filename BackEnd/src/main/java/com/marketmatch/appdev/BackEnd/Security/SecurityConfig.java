@@ -74,6 +74,8 @@ public class SecurityConfig {
                         .requestMatchers("api/cart/postCart/{cartid}").permitAll()
                         .requestMatchers("/api/seller/postSeller/{sellerid}").permitAll()
                         .requestMatchers("/api/buyers/postBuyer/{buyerid}").permitAll()
+                        .requestMatchers("api/user/check-student-id").permitAll()
+                        .requestMatchers("api/user/check-email").permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))

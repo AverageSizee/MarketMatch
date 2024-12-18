@@ -20,7 +20,7 @@ public class UserEntity {
 	private String Lastname;
 	private String Address;
 	private String Phonenumber;
-	private String Student_Id;
+	private String studentid;
 	private String email;
 	private String Password;
 	private boolean isSeller;
@@ -77,12 +77,12 @@ public class UserEntity {
 		Phonenumber = phonenumber;
 	}
 
-	public String getStudent_Id() {
-		return Student_Id;
+	public String getstudentid() {
+		return studentid;
 	}
 
-	public void setStudent_Id(String student_Id) {
-		Student_Id = student_Id;
+	public void setstudentid(String studentId) {
+		studentid = studentId;
 	}
 
 	public String getEmail() {

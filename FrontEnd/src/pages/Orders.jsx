@@ -11,13 +11,13 @@ export default function Orders() {
     const [selectedOrder, setSelectedOrder] = useState(null); // To track which order is being canceled
     const [openCancelDialog, setOpenCancelDialog] = useState(false); // State to control the dialog visibility
     const location = useLocation();
-    const [userData, setUserData] = useState();
+    // const [userData, setUserData] = useState();
 
-    useEffect(() => {
-        if (location.state && location.state.userData) {
-            setUserData(location.state.userData);
-        }
-    }, [location]);
+    // useEffect(() => {
+    //     if (location.state && location.state.userData) {
+    //         setUserData(location.state.userData);
+    //     }
+    // }, [location]);
 
     useEffect(() => {
         axios.get('http://localhost:8080/api/buy/purchase', {
@@ -180,7 +180,7 @@ function OrderCard({ product, onCancel }) {
                     <Typography variant="h6" gutterBottom>Quantity: {product.quantity}x</Typography>
                 </Box>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>
-                    <Typography variant="body2">Total: ${product.total}</Typography> {/* Display total price */}
+                    <Typography variant="body2">Total: P{product.total}</Typography> {/* Display total price */}
                     <Button
                         variant="contained"
                         startIcon={<DeleteIcon />}

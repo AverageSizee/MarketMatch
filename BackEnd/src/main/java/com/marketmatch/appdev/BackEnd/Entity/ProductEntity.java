@@ -52,6 +52,12 @@ public class ProductEntity {
     @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
     private List<BuyEntity> bought;
 
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<SHistoryEntity> Shistory;
+    
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<BHistoryEntity> Bhistory;
+
     public ProductEntity() {
         super();
     }

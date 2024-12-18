@@ -13,6 +13,7 @@ import axios from 'axios';
 import { useAuth } from '../components/AuthContext';
 import CloseIcon from '@mui/icons-material/Close';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 
 const theme = createTheme({
   palette: {
@@ -44,7 +45,7 @@ export default function NavbarWelcome() {
         lastname: '',
         address: '',
         phonenumber: '',
-        student_Id: '',
+        studentid: '',
         email: '',
         password: '',
     });
@@ -52,6 +53,14 @@ export default function NavbarWelcome() {
     const [openSignup, setOpenSignup] = React.useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState("");
+    const [showError, setShowError] = useState({
+        studentIdFormat: false,
+        studentIdExists: false,
+        phoneNumberFormat: false,
+        isCitEmail: false,
+        emailExists: false,
+        passwordFormat: 'weak',
+    });
     const { login } = useAuth();
     const [input, setInput] = useState({
         email: '',
@@ -61,10 +70,15 @@ export default function NavbarWelcome() {
     const [isSuccess, setIsSuccess] = useState(false);
     const [successMessage, setSuccessMessage] = useState('');
 
-    const handleOpenLogin = () => setOpenLogin(true);
+    const handleOpenLogin = () => {
+        setOpenLogin(true);
+        setError('');  
+      };
     const handleCloseLogin = () => setOpenLogin(false);
     const handleOpenSignup = () => setOpenSignup(true);
     const handleCloseSignup = () => setOpenSignup(false);
+
+    const studentIdRegex = /^\d{2}-\d{4}-\d{2}$/;
 
     const togglePasswordVisibility = () => {
         setIsPasswordVisible((prev) => !prev);
@@ -74,18 +88,51 @@ export default function NavbarWelcome() {
         return Object.values(formData).every((field) => field.trim() !== '');
     };
 
-    const handleChange = (e) => {
+    const handleChange = async(e) => {
         const { name, value } = e.target;
         setFormData((prevData) => ({
             ...prevData,
             [name]: value,
         }));
+
+        if (name === 'studentid') {
+            const isValidFormat = validateStudentId(value);
+            setShowError((prevErrors) => ({
+                ...prevErrors,
+                studentIdFormat: !isValidFormat,
+            }));
+            if (isValidFormat) {
+                await checkStudentIdExists(value);
+            }
+        }else if (name === 'phonenumber') {
+            const isValidPhone = validatePhoneNumber(value);
+            setShowError((prevErrors) => ({
+                ...prevErrors,
+                phoneNumberFormat: !isValidPhone,
+            }));
+        }else if (name === 'email') {
+            const isValidEmail = validateCitEmail(value);
+            setShowError((prevErrors) => ({
+                ...prevErrors,
+                isCitEmail: !isValidEmail,
+            }));
+            if (isValidEmail) {
+                await checkEmailExists(value);
+            }
+        }else if (name === 'password') {
+            setShowError((prevErrors) => ({
+                ...prevErrors,
+                passwordFormat: checkPasswordStrength(value),
+            }));
+        }
+        //console.log(showError);
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-    
-        if (isFormComplete()) {
+        //console.log(formData);
+        if (isFormComplete()&&!showError.studentIdFormat&&!showError.studentIdExists
+        &&!showError.phoneNumberFormat&&!showError.isCitEmail&&showError.passwordFormat!=='weak') {
             setIsLoading(true);
             try {
                 const response = await fetch('http://localhost:8080/api/user/postUser', {
@@ -156,7 +203,7 @@ export default function NavbarWelcome() {
                         lastname: '',
                         address: '',
                         phonenumber: '',
-                        student_Id: '',
+                        studentid: '',
                         email: '',
                         password: '',
                     });
@@ -179,8 +226,20 @@ export default function NavbarWelcome() {
             } finally {
                 setIsLoading(false);
             }
-        } else {
+        } else if(showError.studentIdFormat){
+            setError('Please enter a valid student ID in the format XX-XXXX-XX.');
+        }else if(showError.studentIdExists){
+            setError('Student ID already exists.');
+        }else if(showError.phoneNumberFormat){
+            setError('Please enter a valid phone number.');
+        }else if(showError.isCitEmail){
+            setError('Please enter a valid CIT email.');
+        }else if(showError.passwordFormat==='weak'){
+            setError('Please enter a strong password.');
+        }
+        else {
             setError('Please fill in all fields before proceeding.');
+            //console.log(formData)
         }
     };
 
@@ -210,10 +269,86 @@ export default function NavbarWelcome() {
 
     const handleInput = (e) => {
         const { name, value } = e.target;
+
         setInput((prevInput) => ({
             ...prevInput,
             [name]: value
         }));
+    };
+
+    const validateStudentId = (id) => {
+      const idFormat = /^\d{2}-\d{4}-\d{3}$/; // Regex for ##-####-###
+      if (id === '') return true;
+      return idFormat.test(id);
+    };
+
+    // Check Student ID in Database
+    const checkStudentIdExists = async (id) => {
+        try {
+            const response = await axios.post('http://localhost:8080/api/user/check-student-id', { studentId: id });
+            setShowError((prevErrors) => ({
+                ...prevErrors,
+                studentIdExists: response.data.exists,
+            }));
+            //console.log(response.data.exists);
+        } catch (error) {
+            console.error('Error checking student ID:', error);
+        }
+    };
+
+    const checkEmailExists = async (email) => {
+        try {
+            // Send a POST request to check if the email exists
+            const response = await axios.post('http://localhost:8080/api/user/check-email', { email: email });
+    
+            // Update the state to show if the email exists
+            setShowError((prevErrors) => ({
+                ...prevErrors,
+                emailExists: response.data.exists, 
+            }));
+    
+            // Optionally log the result for debugging
+            console.log('Email exists:', response.data.exists);
+        } catch (error) {
+            console.error('Error checking email:', error);
+        }
+    };
+
+    const checkPasswordStrength = (password) => {
+        // Define regular expressions for different password criteria
+        const hasCapitalLetter = /[A-Z]/; // At least one uppercase letter
+        const hasUniqueCharacter = /[^a-zA-Z0-9]/; // At least one non-alphanumeric character
+        const hasLettersAndNumbers = /^[a-zA-Z0-9]+$/; // Only letters and numbers
+        if(password === '') return '';
+    
+        if (hasUniqueCharacter.test(password)) {
+            return 'Strong'; 
+        } else if (hasCapitalLetter.test(password)) {
+            return 'Mid'; 
+        } else if (hasLettersAndNumbers.test(password)) {
+            return 'Weak'; 
+        } else {
+            return 'Weak'; 
+        }
+    };
+
+    const validatePhoneNumber = (number) => {
+        const phoneRegex = /^\d{11}$/;
+        if (number === '') return true;
+        return phoneRegex.test(number);
+      };
+      
+      const validateCitEmail = (email) => {
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@cit\.edu$/;
+        if (email === '') return true;
+        return emailRegex.test(email);
+      };
+
+      const getIconColor = () => {
+        if (showError.passwordFormat === 'Weak') return 'red';
+        if (showError.passwordFormat === 'Mid') return 'gold';
+        if (showError.passwordFormat === 'Strong') return 'green';
+        return 'grey'; // Default color
     };
 
     return (
@@ -273,17 +408,34 @@ export default function NavbarWelcome() {
 
                         <h2 className="signup-title" style={styles.textstyle}>Sign up</h2>
 
-                        <div className='signupbox' style={{marginLeft:50}}>
+                        <div className='signupbox' style={{width: '100%', maxWidth: '300px', padding: '0 20px', boxSizing: 'border-box', marginLeft: '45px'}}>
                             <form className="signup-form" onSubmit={handleSubmit} >
+                                <div style={{ position: 'relative', width: '100%' }}>
                                 <input
                                     type="text"
-                                    name="student_Id"
+                                    name="studentid"
                                     placeholder="Student ID no."
                                     className="signup-input"
-                                    value={formData.student_Id}
-                                    style={styles.input}
+                                    value={formData.studentid}
+                                    style={{
+                                      ...styles.input,
+                                      borderColor: showError.studentIdFormat ? 'red' : '#ccc',
+                                    }}
                                     onChange={handleChange}
                                 />
+                                {(showError.studentIdFormat || showError.studentIdExists) && (
+                                    <ErrorOutlineIcon
+                                        style={{
+                                            position: 'absolute',
+                                            right: '-35px',
+                                            top: '50%',
+                                            transform: 'translateY(-50%)',
+                                            color: 'gold',
+                                        }}
+                                        titleAccess={showError.studentIdFormat ? "Invalid format. Use ##-####-###" : "Student ID already exists"}
+                                    />
+                                )}
+                                </div>
                                 <input
                                     type="text"
                                     name="firstname"
@@ -311,24 +463,58 @@ export default function NavbarWelcome() {
                                     style={styles.input}
                                     onChange={handleChange}
                                 />
-                                <input
-                                    type="text"
-                                    name="phonenumber"
-                                    placeholder="Phone Number"
-                                    className="signup-input"
-                                    value={formData.phonenumber}
-                                    style={styles.input}
-                                    onChange={handleChange}
-                                />
-                                <input
-                                    type="email"
-                                    name="email"
-                                    placeholder="Institutional Email"
-                                    className="signup-input"
-                                    value={formData.email}
-                                    style={styles.input}
-                                    onChange={handleChange}
-                                />
+                                <div style={{ position: 'relative', width: '100%' }}>
+                                    <input
+                                        type="text"
+                                        name="phonenumber"
+                                        placeholder="Phone Number"
+                                        className="signup-input"
+                                        value={formData.phonenumber}
+                                        style={{
+                                            ...styles.input,
+                                            borderColor: showError.phoneNumberFormat ? 'red' : '#ccc',
+                                        }}
+                                        onChange={handleChange}
+                                    />
+                                    {showError.phoneNumberFormat && (
+                                        <ErrorOutlineIcon
+                                            style={{
+                                                position: 'absolute',
+                                                right: '-35px',
+                                                top: '50%',
+                                                transform: 'translateY(-50%)',
+                                                color: 'gold',
+                                            }}
+                                            titleAccess="Invalid phone number. Must be 11 digits."
+                                        />
+                                    )}
+                                </div>
+                                <div style={{ position: 'relative', width: '100%' }}>
+                                    <input
+                                        type="email"
+                                        name="email"
+                                        placeholder="Institutional Email"
+                                        className="signup-input"
+                                        value={formData.email}
+                                        style={{
+                                            ...styles.input,
+                                            borderColor: showError.isCitEmail ? 'red' : '#ccc',
+                                        }}
+                                        onChange={handleChange}
+                                    />
+                                    {(showError.isCitEmail || showError.emailExists) && (
+                                        <ErrorOutlineIcon
+                                            style={{
+                                                position: 'absolute',
+                                                right: '-35px',
+                                                top: '50%',
+                                                transform: 'translateY(-50%)',
+                                                color: 'gold',
+                                            }}
+                                            titleAccess={showError.isCitEmail ? "Invalid format. Use example@cit.edu" : "Email already exists"}
+                                        />
+                                    )}
+                                </div>
                                 <div className="password-container" >
                                     <input
                                         type={isPasswordVisible ? 'text' : 'password'}
@@ -342,12 +528,25 @@ export default function NavbarWelcome() {
                                     <IconButton onClick={togglePasswordVisibility} className="visibility-icon" style={{right:45, top:'1px'}}>
                                         {isPasswordVisible ? <Visibility /> : <VisibilityOff />}
                                     </IconButton>
+                                    {formData.password && (
+                                        <ErrorOutlineIcon
+                                            style={{
+                                                position: 'absolute',
+                                                right: '-35px',
+                                                top: '50%',
+                                                transform: 'translateY(-50%)',
+                                                color: getIconColor(), // Dynamic color based on strength
+                                            }}
+                                            titleAccess={`Password Strength: ${showError.passwordFormat}`}
+                                        />
+                                    )}
                                 </div>
-
+                                {error && <p style={{ color: 'gold' }}>{error}</p>}
                                 <button type="submit" className="signup-button">
                                     SIGN UP
                                 </button>
 
+                                <br />
                                 <span style={{ color: 'gold' }}>Already have an account?</span>
                                 <span
                                     onClick={() => {
@@ -517,7 +716,7 @@ const styles = {
     input: {
         width: '90%', 
         padding: '12px', 
-        margin: '10px 0',
+        margin: '10px 0px',
         borderRadius: '4px',
         border: '1px solid #ccc',
         outline: 'none',
@@ -536,9 +735,10 @@ const styles = {
     icon: {
         cursor: 'pointer',
         position: 'absolute', 
-        left: 270,        
-        top: '50%',           
+        left: 260,        
+        top: '55%',           
         transform: 'translateY(-50%)', 
+        color: 'gray',
     },
     textstyle: {
         color: 'white',
@@ -553,13 +753,20 @@ const styles = {
         width:300
     },
     passwordinput:{
-        width:200, 
+        width:190, 
         padding: '12px', 
         margin: '10px 0',
         borderRadius: '4px',
         border: '1px solid #ccc',
         outline: 'none',
         backgroundColor:'white',
-    }
+    },
+    errorIcon: {
+      position: 'absolute',
+      right: '10px',
+      top: '50%',
+      transform: 'translateY(-50%)',
+      color: 'red',
+    },
 };
 

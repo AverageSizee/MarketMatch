@@ -59,6 +59,7 @@ const Cart = () => {
                 setDialogMessage("Purchase successful!");
                 setDialogSeverity("success");
                 setDialogOpen(true);
+                setCartItems(cartItems.filter(item => item.productId !== product.productId));
             })
             .catch(error => {
                 console.error("Error during purchase:", error);
@@ -147,7 +148,7 @@ const Cart = () => {
                                     Total Price:
                                 </Typography>
                                 <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                                    ${totalCartPrice}
+                                    P{totalCartPrice}
                                 </Typography>
                             </Box>
                         </Paper>
@@ -219,7 +220,7 @@ const CartItem = ({ product, onRemoveFromCart, onQuantityChange, onBuy }) => {
                 </Grid>
                 <Grid item xs={12} sm={4}>
                     <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>{product.productName}</Typography>
-                    <Typography variant="body2">Price: ${parseFloat(product.productPrice).toFixed(2)}</Typography>
+                    <Typography variant="body2">Price: P{parseFloat(product.productPrice).toFixed(2)}</Typography>
                     <Box sx={{ mt: 1 }}>
                         <Select
                             value={quantity}
@@ -234,7 +235,7 @@ const CartItem = ({ product, onRemoveFromCart, onQuantityChange, onBuy }) => {
                     </Box>
                 </Grid>
                 <Grid item xs={12} sm={2}>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>Total: ${totalPrice}</Typography>
+                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>Total: P{totalPrice}</Typography>
                 </Grid>
                 <Grid item xs={12} sm={2}>
                     <Button

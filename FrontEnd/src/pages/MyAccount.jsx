@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef} from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { 
   TextField, Button, Typography, Container, Box, Modal, IconButton,
@@ -107,6 +107,8 @@ function MyAccount() {
       return;
     }
 
+    setLoading(true);  // Start loading
+
     try {
       await axios.put(`http://localhost:8080/api/user/updateUser?id=${userId}`, userData, {
         withCredentials: true,
@@ -115,25 +117,29 @@ function MyAccount() {
           'Authorization': 'Bearer ' + sessionStorage.getItem('token'),
         },
       });
-      setDialogMessage("Changes saved!");
-      setDialogOpen(true);  // Open the dialog after save
-      window.location.reload();
+      setDialogMessage("Changes saved successfully!");
+      setDialogOpen(true);
     } catch (error) {
       console.error("Error updating user data", error);
+      setDialogMessage("Error saving changes. Please try again.");
+      setDialogOpen(true);
+    } finally {
+      setLoading(false);  // Stop loading regardless of outcome
     }
   };
 
   const handlePasswordChange = async () => {
     if (!passwordValid.length || !passwordValid.capital || !passwordValid.specialChar) {
       setDialogMessage("Password must be at least 8 characters long, contain at least one capital letter, and one special character.");
-      setDialogOpen(true);  // Show dialog if password is invalid
+      setDialogOpen(true);
       return;
     }
 
     if (password !== confirmPassword) {
       setDialogMessage("Passwords do not match!");
-      setDialogOpen(true);  // Show dialog if passwords don't match
+      setDialogOpen(true);
     } else {
+      setLoading(true);  // Start loading
       try {
         await axios.put('http://localhost:8080/api/user/updatePassword', null, {
           params: { id: userId, password },
@@ -144,10 +150,14 @@ function MyAccount() {
           },
         });
         setDialogMessage("Password changed successfully!");
-        setDialogOpen(true);  // Show dialog for successful password change
+        setDialogOpen(true);
         setPasswordModalOpen(false);
       } catch (error) {
         console.error("Error changing password", error);
+        setDialogMessage("Error changing password. Please try again.");
+        setDialogOpen(true);
+      } finally {
+        setLoading(false);  // Stop loading regardless of outcome
       }
     }
   };
@@ -176,16 +186,18 @@ function MyAccount() {
 
   const handleDialogClose = () => {
     setDialogOpen(false);
+    // if (dialogMessage === "Changes saved successfully!" || dialogMessage === "Password changed successfully!") {
+    //   window.location.reload();
+    // }
   };
-
 
   return (
     <Container maxWidth={false} disableGutters sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-       <Navbar />
+      <Navbar />
       <Box sx={{ flexGrow: 1, display: 'flex', padding: 4, marginTop: '.01rem' }} className="padding-color-outer">
         <Grid container spacing={4}>
           <Grid item xs={12} md={4} lg={3}>
-          <SideBar onLoad={handleSideBarLoad} />
+            <SideBar onLoad={handleSideBarLoad} />
           </Grid>
           <Grid item xs={12} md={8} lg={9}>
             <Paper elevation={3} sx={{ padding: 4 }}>
@@ -343,16 +355,26 @@ function MyAccount() {
         </Grid>
       </Box>
 
-
       {/* Phone Number Warning Modal */}
       <Modal
         open={phoneNumberWarningOpen}
         onClose={() => setPhoneNumberWarningOpen(false)}
         aria-labelledby="phone-number-warning"
       >
-        <Box sx={{ width: 300, padding: 2, backgroundColor: 'white', position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
+        <Box sx={{
+          width: 300,
+          padding: 2,
+          backgroundColor: 'maroon',
+          color: 'white',
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          border: '2px solid gold',
+          borderRadius: 2,
+        }}>
           <Typography variant="h6" gutterBottom>Warning!</Typography>
-          <Typography variant="body1" color="error">Phone number must be exactly 11 digits.</Typography>
+          <Typography variant="body1" color="gold">Phone number must be exactly 11 digits.</Typography>
           <Button variant="contained" color="primary" onClick={() => setPhoneNumberWarningOpen(false)} sx={{ marginTop: 2 }}>
             OK
           </Button>
@@ -362,8 +384,14 @@ function MyAccount() {
       {/* Loading Modal */}
       <Modal open={loading}>
         <Box sx={{
-          position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
-          backgroundColor: 'maroon', padding: 2, borderRadius: 2, border: '4px solid gold',
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          backgroundColor: 'maroon',
+          padding: 2,
+          borderRadius: 2,
+          border: '4px solid gold',
         }}>
           <CircularProgress color="inherit" sx={{ color: 'white' }} />
         </Box>
@@ -371,7 +399,18 @@ function MyAccount() {
 
       {/* Password Change Modal */}
       <Modal open={passwordModalOpen} onClose={togglePasswordModal}>
-        <Box sx={{ width: 400, padding: 4, backgroundColor: 'white', position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
+        <Box sx={{
+          width: 400,
+          padding: 4,
+          backgroundColor: 'maroon',
+          color: 'white',
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          border: '2px solid gold',
+          borderRadius: 2,
+        }}>
           <Typography variant="h6" gutterBottom>Change Password</Typography>
           <TextField
             fullWidth
@@ -407,28 +446,15 @@ function MyAccount() {
           />
 
           {/* Password Validation Feedback */}
-          <Typography variant="body2" color={passwordValid.length ? 'green' : 'red'}>
+          <Typography variant="body2" color={passwordValid.length ? 'lightgreen' : 'pink'}>
             {passwordValid.length ? '✅ At least 8 characters' : '❌ At least 8 characters'}
           </Typography>
-          <Typography variant="body2" color={passwordValid.capital ? 'green' : 'red'}>
+          <Typography variant="body2" color={passwordValid.capital ? 'lightgreen' : 'pink'}>
             {passwordValid.capital ? '✅ At least 1 capital letter' : '❌ At least 1 capital letter'}
           </Typography>
-          <Typography variant="body2" color={passwordValid.specialChar ? 'green' : 'red'}>
+          <Typography variant="body2" color={passwordValid.specialChar ? 'lightgreen' : 'pink'}>
             {passwordValid.specialChar ? '✅ At least 1 special character' : '❌ At least 1 special character'}
           </Typography>
-
-          {/* Consolidated Alert Dialog */}
-          <Dialog open={dialogOpen} onClose={handleDialogClose}>
-            <DialogTitle>Alert</DialogTitle>
-            <DialogContent>
-              <Typography variant="body1">{dialogMessage}</Typography>
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={handleDialogClose} color="primary">
-                OK
-              </Button>
-            </DialogActions>
-          </Dialog>
 
           <Button
             variant="contained"
@@ -441,6 +467,25 @@ function MyAccount() {
           </Button>
         </Box>
       </Modal>
+
+      {/* Consolidated Alert Dialog */}
+      <Dialog open={dialogOpen} onClose={handleDialogClose} PaperProps={{
+        style: {
+          backgroundColor: 'maroon',
+          color: 'white',
+          border: '2px solid gold',
+        },
+      }}>
+        <DialogTitle>Alert</DialogTitle>
+        <DialogContent>
+          <Typography variant="body1">{dialogMessage}</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDialogClose} color="primary">
+            OK
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 }
@@ -466,3 +511,4 @@ const EditableAvatar = styled(Avatar)(({ theme }) => ({
     },
   },
 }));
+

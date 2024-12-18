@@ -51,9 +51,9 @@ public class SHistoryEntity {
     public void setId(Long id) {
         this.id = id;
     }
-    public SellerEntity getSeller() {
-        return seller;
-    }
+    // public SellerEntity getSeller() {
+    //     return seller;
+    // }
     public void setSeller(SellerEntity seller) {
         this.seller = seller;
     }

@@ -1,21 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import Navbar from '../components/Navbar';
-import Container from '@mui/material/Container';
-import SideBar from '../components/SideBar';
-import Grid from '@mui/material/Grid2';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
-import Typography from '@mui/material/Typography';
-import Divider from '@mui/material/Divider';
-import Box from '@mui/material/Box';
+import { Container, Grid, Typography, Box, Paper, Button, TextField, FormControlLabel, Switch, IconButton, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
-import IconButton from '@mui/material/IconButton';
-import Dialog from '@mui/material/Dialog';
-import Switch from '@mui/material/Switch';
-import FormControlLabel from '@mui/material/FormControlLabel';
+import Navbar from '../components/Navbar';
+import SideBar from '../components/SideBar';
 import axios from 'axios';
 import '../App.css';
 
@@ -24,7 +11,7 @@ export default function MyProducts() {
     const [open, setOpen] = useState(false);
     const [currentProduct, setCurrentProduct] = useState(null);
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
-    const [deleteProductId, setDeleteProductId] = useState(null);
+    const [deleteProductId, setDeleteProductId] = useState(null);   
 
     const sellerId = sessionStorage.getItem('id');
 
@@ -138,168 +125,31 @@ export default function MyProducts() {
     };
 
     return (
-        <Container maxWidth={false} disableGutters sx={{ height: '100vh' }}>
-            <Grid sx={{ paddingTop: 1, paddingBottom: 1 }}>
-                <Navbar />
-            </Grid>
-
-            <Grid
-                className="padding-color-outer"
-                container
-                direction={'row'}
-                spacing={3}
-                wrap="nowrap"
-                sx={{ height: '100%' }}
-            >
-                <Grid size={{ md: 4 }}>
-                    <SideBar
-                        state={{
-                            userData: location.state ? location.state.userData : null,
-                        }}
-                    />
-                </Grid>
-
-                <Grid
-                    size={{ md: 8 }}
-                    container
-                    direction={'column'}
-                    sx={{ width: 'auto', backgroundColor: 'white', padding: 4 }}
-                >
-                    <Grid>
-                        <Typography variant="h4">My Products</Typography>
-                        <Divider
-                            sx={{
-                                borderBottomWidth: 2,
-                                borderColor: 'black',
-                                margin: '20px 0',
-                            }}
-                        />
+        <Container maxWidth={false} disableGutters sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: '#800000' }}>
+            <Navbar />
+            <Box sx={{ flexGrow: 1, display: 'flex', padding: 4 }}>
+                <Grid container spacing={4}>
+                    <Grid item xs={12} md={3} lg={2.5}>
+                        <SideBar />
                     </Grid>
-
-                    <Grid
-                        container
-                        sx={{
-                            marginTop: 0,
-                            maxHeight: 'calc(100vh - 200px)',
-                            overflowY: 'auto',
-                            overflowX: 'hidden',
-                            border: '2px solid black',
-                            padding: '1rem',
-                            width: '100%',
-                        }}
-                    >
-                        {products.length > 0 ? (
-                            products.map((product) => (
-                                <Grid
-                                    container
-                                    key={product.productId}
-                                    sx={{
-                                        border: '1px solid black',
-                                        borderRadius: 2,
-                                        padding: 2,
-                                        marginBottom: 2,
-                                        backgroundColor: '#f9f9f9',
-                                        position: 'relative',
-                                        width: '100%',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                    }}
-                                >
-                                    <Grid
-                                        item
-                                        xs={12}
-                                        md={2}
-                                        sx={{
-                                            display: 'flex',
-                                            justifyContent: 'center',
-                                            alignItems: 'center',
-                                        }}
-                                    >
-                                        <Box
-                                            component="img"
-                                            src={
-                                                product.image
-                                                    ? `data:image/jpeg;base64,${product.image}`
-                                                    : 'https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png'
-                                            }
-                                            alt={product.productName}
-                                            sx={{
-                                                width: '100px',
-                                                height: '100px',
-                                                objectFit: 'cover',
-                                                borderRadius: 1,
-                                            }}
-                                        />
-                                    </Grid>
-
-                                    <Grid
-                                        item
-                                        xs={12}
-                                        md={7}
-                                        sx={{
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            justifyContent: 'center',
-                                            paddingLeft: 2,
-                                        }}
-                                    >
-                                        <Typography variant="h6" sx={{ fontWeight: 'bold', marginBottom: 1 }}>
-                                            {product.productName}
-                                        </Typography>
-                                        <Typography variant="body2" sx={{ marginBottom: 1 }}>
-                                            Price: ${parseFloat(product.productPrice).toFixed(2)}
-                                        </Typography>
-                                        <Typography variant="body2" sx={{ color: 'gray' }}>
-                                            Status: {product.productStatus}
-                                        </Typography>
-                                    </Grid>
-
-                                    <Grid
-                                        item
-                                        xs={12}
-                                        md={3}
-                                        sx={{
-                                            display: 'flex',
-                                            flexDirection: { xs: 'row', md: 'column' },
-                                            justifyContent: 'flex-end',
-                                            alignItems: 'flex-end',
-                                            gap: 1,
-                                            mt: { xs: 2, md: 0 },
-                                        }}
-                                    >
-                                        <Button
-                                            variant="contained"
-                                            color="primary"
-                                            sx={{
-                                                backgroundColor: 'black',
-                                                color: 'white',
-                                                width: '100px',
-                                            }}
-                                            onClick={() => handleEdit(product.productId)}
-                                        >
-                                            EDIT
-                                        </Button>
-                                        <Button
-                                            variant="contained"
-                                            color="error"
-                                            sx={{
-                                                backgroundColor: 'red',
-                                                color: 'white',
-                                                width: '100px',
-                                            }}
-                                            onClick={() => handleDeleteOpen(product.productId)}
-                                        >
-                                            DELETE
-                                        </Button>
-                                    </Grid>
-                                </Grid>
-                            ))
-                        ) : (
-                            <Typography sx={{ padding: 2 }}>No products found.</Typography>
-                        )}
+                    <Grid item xs={12} md={9} lg={9.5}>
+                        <Paper elevation={3} sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+                            <Typography variant="h5" sx={{ p: 2, borderBottom: '1px solid #e0e0e0', fontWeight: 'bold' }}>
+                                My Products
+                            </Typography>
+                            <Box sx={{ flexGrow: 1, overflowY: 'auto', p: 2, maxHeight: 'calc(100vh - 250px)' }}>
+                                {products.length > 0 ? (
+                                    products.map((product) => (
+                                        <ProductItem key={product.productId} product={product} handleEdit={handleEdit} handleDeleteOpen={handleDeleteOpen} />
+                                    ))
+                                ) : (
+                                    <Typography variant="body1" sx={{ textAlign: 'center', py: 4 }}>No products found.</Typography>
+                                )}
+                            </Box>
+                        </Paper>
                     </Grid>
                 </Grid>
-            </Grid>
+            </Box>
 
             <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
                 <Box sx={{ padding: 3 }}>
@@ -307,61 +157,61 @@ export default function MyProducts() {
                         Edit Product
                     </Typography>
                     <Box sx={{ textAlign: 'center', marginTop: 1 }}>
-                    <IconButton
-                        color="primary"
-                        aria-label="upload image"
-                        component="label"
-                        sx={{
-                            position: 'relative',
-                            display: 'inline-block',
-                            width: 200,
-                            height: 200,
-                            borderRadius: 2,
-                            overflow: 'hidden',
-                            backgroundColor: currentProduct?.image ? 'transparent' : '#f0f0f0',
-                            border: currentProduct?.image ? 'none' : '1px dashed #ccc',
-                        }}
-                    >
-                        {currentProduct?.image ? (
-                            <Box
-                                component="img"
-                                src={`data:image/jpeg;base64,${currentProduct.image}`}
-                                alt="Uploaded"
-                                sx={{
-                                    width: '100%',
-                                    height: '100%',
-                                    objectFit: 'cover',
+                        <IconButton
+                            color="primary"
+                            aria-label="upload image"
+                            component="label"
+                            sx={{
+                                position: 'relative',
+                                display: 'inline-block',
+                                width: 200,
+                                height: 200,
+                                borderRadius: 2,
+                                overflow: 'hidden',
+                                backgroundColor: currentProduct?.image ? 'transparent' : '#f0f0f0',
+                                border: currentProduct?.image ? 'none' : '1px dashed #ccc',
+                            }}
+                        >
+                            {currentProduct?.image ? (
+                                <Box
+                                    component="img"
+                                    src={`data:image/jpeg;base64,${currentProduct.image}`}
+                                    alt="Uploaded"
+                                    sx={{
+                                        width: '100%',
+                                        height: '100%',
+                                        objectFit: 'cover',
+                                    }}
+                                />
+                            ) : (
+                                <>
+                                    <CloudUploadIcon sx={{ fontSize: 50, color: '#ccc' }} />
+                                    <Typography variant="body2" sx={{ mt: 1 }}>
+                                        Upload an image
+                                    </Typography>
+                                </>
+                            )}
+                            <input
+                                hidden
+                                accept="image/*"
+                                type="file"
+                                onChange={(e) => {
+                                    const file = e.target.files[0];
+                                    if (file) {
+                                        const reader = new FileReader();
+                                        reader.onload = () => {
+                                            const imageData = reader.result.replace(/^data:image\/[a-z]+;base64,/, '');
+                                            setCurrentProduct((prev) => ({
+                                                ...prev,
+                                                image: imageData,
+                                            }));
+                                        };
+                                        reader.readAsDataURL(file);
+                                    }
                                 }}
                             />
-                        ) : (
-                            <>
-                                <CloudUploadIcon sx={{ fontSize: 50, color: '#ccc' }} />
-                                <Typography variant="body2" sx={{ mt: 1 }}>
-                                    Upload an image
-                                </Typography>
-                            </>
-                        )}
-                        <input
-                            hidden
-                            accept="image/*"
-                            type="file"
-                            onChange={(e) => {
-                                const file = e.target.files[0];
-                                if (file) {
-                                    const reader = new FileReader();
-                                    reader.onload = () => {
-                                        const imageData = reader.result.replace(/^data:image\/[a-z]+;base64,/, '');
-                                        setCurrentProduct((prev) => ({
-                                            ...prev,
-                                            image: imageData,
-                                        }));
-                                    };
-                                    reader.readAsDataURL(file);
-                                }
-                            }}
-                        />
-                    </IconButton>
-                </Box>
+                        </IconButton>
+                    </Box>
 
                     <TextField
                         fullWidth
@@ -417,6 +267,7 @@ export default function MyProducts() {
                     </Box>
                 </Box>
             </Dialog>
+
             <Dialog
                 open={openDeleteDialog}
                 onClose={handleDeleteClose}
@@ -447,6 +298,113 @@ export default function MyProducts() {
                 </DialogActions>
             </Dialog>
         </Container>
+    );
+}
+
+function ProductItem({ product, handleEdit, handleDeleteOpen }) {
+    return (
+        <Grid
+            container
+            sx={{
+                border: '1px solid black',
+                borderRadius: 2,
+                padding: 2,
+                marginBottom: 2,
+                backgroundColor: '#f9f9f9',
+                position: 'relative',
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+            }}
+        >
+            <Grid
+                item
+                xs={12}
+                md={2}
+                sx={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                }}
+            >
+                <Box
+                    component="img"
+                    src={
+                        product.image
+                            ? `data:image/jpeg;base64,${product.image}`
+                            : 'https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png'
+                    }
+                    alt={product.productName}
+                    sx={{
+                        width: '100px',
+                        height: '100px',
+                        objectFit: 'cover',
+                        borderRadius: 1,
+                    }}
+                />
+            </Grid>
+
+            <Grid
+                item
+                xs={12}
+                md={7}
+                sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    paddingLeft: 2,
+                }}
+            >
+                <Typography variant="h6" sx={{ fontWeight: 'bold', marginBottom: 1 }}>
+                    {product.productName}
+                </Typography>
+                <Typography variant="body2" sx={{ marginBottom: 1 }}>
+                    Price: ${parseFloat(product.productPrice).toFixed(2)}
+                </Typography>
+                <Typography variant="body2" sx={{ color: 'gray' }}>
+                    Status: {product.productStatus}
+                </Typography>
+            </Grid>
+
+            <Grid
+                item
+                xs={12}
+                md={3}
+                sx={{
+                    display: 'flex',
+                    flexDirection: { xs: 'row', md: 'column' },
+                    justifyContent: 'flex-end',
+                    alignItems: 'flex-end',
+                    gap: 1,
+                    mt: { xs: 2, md: 0 },
+                }}
+            >
+                <Button
+                    variant="contained"
+                    color="primary"
+                    sx={{
+                        backgroundColor: 'black',
+                        color: 'white',
+                        width: '100px',
+                    }}
+                    onClick={() => handleEdit(product.productId)}
+                >
+                    EDIT
+                </Button>
+                <Button
+                    variant="contained"
+                    color="error"
+                    sx={{
+                        backgroundColor: 'red',
+                        color: 'white',
+                        width: '100px',
+                    }}
+                    onClick={() => handleDeleteOpen(product.productId)}
+                >
+                    DELETE
+                </Button>
+            </Grid>
+        </Grid>
     );
 }
 

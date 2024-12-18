@@ -96,11 +96,11 @@ function HistoryItem({ history, deleteHistory }) {
                     </Box>
                 </Grid>
                 <Grid item xs={12} md={8}>
-                    <Typography variant="h6" gutterBottom>{history.productName}</Typography>
+                    <Typography variant="h6" gutterBottom>{history.product.productName}</Typography>
                     <Grid container spacing={2}>
                         <Grid item xs={6}>
                             <Typography variant="body2" color="text.secondary">Price:</Typography>
-                            <Typography variant="body1">P {history.price}</Typography>
+                            <Typography variant="body1">P {history.product.price}</Typography>
                         </Grid>
                         <Grid item xs={6}>
                             <Typography variant="body2" color="text.secondary">Quantity:</Typography>

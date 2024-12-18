@@ -192,7 +192,7 @@ export default function Transactions() {
                     <Grid item xs={12} md={9} lg={9.5}>
                         <Paper elevation={3} sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                             <Typography variant="h5" sx={{ p: 2, borderBottom: '1px solid #e0e0e0', fontWeight: 'bold' }}>
-                                Transactions
+                                Manage Orders
                             </Typography>
                             <Box sx={{ flexGrow: 1, overflowY: 'auto', p: 2, maxHeight: 'calc(100vh - 250px)' }}>
                                 {transactions.length > 0 ? (

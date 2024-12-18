@@ -46,10 +46,10 @@ export default function Navbar() {
         event.preventDefault(); 
         
         
-        if (!isSeller) {
-            setDialogOpen(true);  
-        } else {
+        if (isSeller) {
             navigate('/sell-product');
+        } else {
+            setDialogOpen(true);  
         }
       };
     

@@ -2,6 +2,8 @@ package com.marketmatch.appdev.BackEnd.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.naming.NameNotFoundException;
 
@@ -58,6 +60,15 @@ public class UserService {
 		return urepo.findByuserId(id);
 	}
 
+    // Check if the student ID already exists in the database
+    public boolean doesStudentIdExist(String studentId) {
+        return urepo.existsByStudentid(studentId);
+    }
+
+	public boolean doesEmailExist(String email) {
+		return urepo.existsByEmail(email);
+	}
+
 	//update
 	@SuppressWarnings("finally")
 	public UserEntity putUserDetails(int id, UserEntity newUserDetails) {
@@ -75,7 +86,7 @@ public class UserService {
 			user.setLastname(newUserDetails.getLastname());
 			user.setAddress(newUserDetails.getAddress());
 			user.setPhonenumber(newUserDetails.getPhonenumber());
-			user.setStudent_Id(newUserDetails.getStudent_Id());
+			user.setstudentid(newUserDetails.getstudentid());
 			user.setEmail(newUserDetails.getEmail());
 			user.setPassword(newUserDetails.getPassword());
 			user.setImage(newUserDetails.getImage());
