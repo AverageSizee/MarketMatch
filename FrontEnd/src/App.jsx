@@ -9,6 +9,7 @@ import MyAccount from './pages/MyAccount';
 import Welcome from './pages/Welcome';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
+import ViewProfile from './pages/ViewProfile';
 import MyPurchase from './pages/Cart';
 import NotFound from './pages/NotFound';
 import Transactions from './pages/Transactions';
@@ -38,6 +39,8 @@ function App() {
           <Route path="/transaction" element={<ProtectedRoutes><Transactions /></ProtectedRoutes>} />
           <Route path="/buyerhistory" element={<ProtectedRoutes><BuyerHistory /></ProtectedRoutes>} />
           <Route path="/sellerhistory" element={<ProtectedRoutes><SellerHistory /></ProtectedRoutes>} />
+
+          <Route path='/ViewProfile/:ViewName/:userId' element={<ProtectedRoutes><ViewProfile /></ProtectedRoutes>} />
 
 
           

@@ -23,7 +23,7 @@ public class SellerController {
     @GetMapping("/getAll/{sellerid}")
     public SellerEntity getAllSeller(@PathVariable int sellerid) {
         SellerEntity seller = seller_serv.getSellerById(sellerid);
-        seller.getProducts().size();
+        // seller.getProducts().size();
         return seller;
     }
 

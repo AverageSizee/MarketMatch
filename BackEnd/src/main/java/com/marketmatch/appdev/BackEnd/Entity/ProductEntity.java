@@ -129,7 +129,9 @@ public class ProductEntity {
         this.sellerid = sellerid;
     }
     
-
+    // public SellerEntity getSellerid() {
+    //     return sellerid;
+    // }
     // public List<BuyEntity> getBought() {
     //     return bought;
     // }

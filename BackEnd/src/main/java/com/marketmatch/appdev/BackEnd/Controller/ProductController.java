@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.marketmatch.appdev.BackEnd.DTO.Items;
 import com.marketmatch.appdev.BackEnd.Entity.ProductEntity;
 import com.marketmatch.appdev.BackEnd.Service.ProductService;
 
@@ -35,13 +36,13 @@ public class ProductController {
 
     // READ
     @GetMapping("/getProducts/{productId}")
-    public ProductEntity getProducts(@PathVariable int productId) {
-        return productService.readProducts(productId);
+    public Items getProducts(@PathVariable int productId) {
+        return productService.getProductById(productId);
     }
 
      @GetMapping("/getAllProducts")
-    public List<ProductEntity> getAllProducts() {
-        return productService.readAllProducts();
+    public List<Items> getAllProducts() {
+        return productService.getAllProducts();
     }
 
     @GetMapping("/related")

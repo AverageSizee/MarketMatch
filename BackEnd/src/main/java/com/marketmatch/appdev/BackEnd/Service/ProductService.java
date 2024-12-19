@@ -7,6 +7,7 @@ import java.util.Optional;
 import javax.naming.NameNotFoundException;
 
 import com.marketmatch.appdev.BackEnd.DTO.Account;
+import com.marketmatch.appdev.BackEnd.DTO.Items;
 import com.marketmatch.appdev.BackEnd.DTO.ProductRequest;
 import com.marketmatch.appdev.BackEnd.Entity.SellerEntity;
 import com.marketmatch.appdev.BackEnd.Entity.UserEntity;
@@ -65,12 +66,21 @@ public class ProductService {
             throw new RuntimeException("Error retrieving product: " + e.getMessage(), e); 
         }
     }
+
+    public Items getProductById(int productId) {
+        return prodrepo.findProductById(productId);
+    }
+    
     public List<ProductEntity> readAllProducts() {
        return prodrepo.findAll();
     }
     
     public List<ProductEntity> getProductsSoldByUser(SellerEntity id) {
         return prodrepo.findBysellerid(id);
+    }
+
+        public List<Items> getAllProducts() {
+        return prodrepo.findAllProducts();
     }
 
     public List<ProductEntity> getRelatedProducts(String productName, int productId) {
