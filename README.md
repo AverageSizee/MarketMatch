@@ -17,6 +17,11 @@
   <a href="https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter"><img src="https://img.shields.io/badge/Spring%20Boot-v3.2.11-brightgreen" alt="Spring Boot version"></a>
 </p>
 
+## Preview
+<p align="center">
+  <img src="example.png" alt="Project Preview" width="600">
+</p>
+
 # CIT-U MARKET MATCH 🎉
 
 Providing a platform that promotes items that may not be well-recognized within the 
